@@ -1,14 +1,11 @@
-export const system_prompt = ({
-  city_name,
-  number_of_days,
-  start_date,
-  end_date,
-}: {
-  city_name: string;
-  number_of_days: number;
-  start_date: Date;
-  end_date: Date;
-}) => {
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+export const system_prompt = (
+  city_name: string,
+  number_of_days: number,
+  start_date: Date | string,
+  end_date: Date | string
+) => {
   return `
 You are an expert travel planner with deep knowledge of global destinations. Generate a detailed, personalized travel itinerary based on the following parameters:
 
@@ -79,3 +76,6 @@ Constraints:
 - Factor in local holidays and closures
 - Account for seasonal variations`;
 };
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+export const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });

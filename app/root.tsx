@@ -31,7 +31,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body>
+      <body className="border-2 w-11/12  max-w-7xl mx-auto  min-h-screen">
         {children}
         <ScrollRestoration />
         <Scripts />
