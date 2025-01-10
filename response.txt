@@ -1,0 +1,192 @@
+```json
+{
+  "hotel_names": [
+    {
+      "name": "Hotel Maurya Patna",
+      "link": "https://www.hotelmauryapatna.com/",
+      "hotel_image": "https://www.hotelmauryapatna.com/images/slider/slider-1.jpg"
+    },
+    {
+      "name": "Lemon Tree Premier, Patna",
+      "link": "https://www.lemontreehotels.com/lemon-tree-premier/patna/hotel-in-patna.aspx",
+      "hotel_image": "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1c/19/47/a6/lemon-tree-premier-patna.jpg?w=1200&h=-1&s=1"
+    },
+    {
+      "name": "The Panache",
+      "link": "https://www.thepanache.in/",
+      "hotel_image": "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1b/36/47/6a/the-panache-patna.jpg?w=1200&h=-1&s=1"
+    },
+    {
+      "name": "Hotel Patliputra Exotica",
+      "link": "https://www.hotelpatliputraexotica.com/",
+      "hotel_image": "https://www.hotelpatliputraexotica.com/images/slider/slider-1.jpg" 
+    },
+    {
+      "name": "Chanakya Hotel",
+      "link": "https://www.chanakyahotel.in/",
+      "hotel_image": "https://www.chanakyahotel.in/images/about-img.jpg"
+    }
+  ],
+  "plan": [
+    {
+      "day": "Day 1",
+      "weather": {
+        "temperature": "18°C/64°F",
+        "condition": "Partly Cloudy",
+        "precipitation_chance": "10%",
+        "humidity": "55%",
+        "recommendation": "Pleasant weather for outdoor sightseeing. Carry a light jacket."
+      },
+      "visiting_place_name": "Takht Sri Patna Sahib",
+      "visiting_place_brief": "One of the holiest sites for Sikhs, the birthplace of Guru Gobind Singh.  The architecture and spiritual atmosphere are captivating.",
+      "visiting_place_image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Takht_Sri_Harmandir_Ji_Patna_Sahib.jpg/1280px-Takht_Sri_Harmandir_Ji_Patna_Sahib.jpg",
+      "lunch_recommendation_places": [
+        {
+          "name": "Harilal's Restaurant",
+          "cuisine": "North Indian",
+          "price_range": "₹₹"
+        },
+        {
+          "name": "17 Degrees Cafe",
+          "cuisine": "Cafe",
+          "price_range": "₹₹"
+        },
+        {
+          "name": "Biryani Mahal",
+          "cuisine": "Biryani",
+          "price_range": "₹"
+        }
+      ]
+    },
+    {
+      "day": "Day 2",
+      "weather": {
+        "temperature": "19°C/66°F",
+        "condition": "Sunny",
+        "precipitation_chance": "5%",
+        "humidity": "50%",
+        "recommendation": "Ideal weather for exploring outdoor attractions."
+      },
+      "visiting_place_name": "Golghar",
+      "visiting_place_brief": "A unique beehive-shaped granary built by the British, offering panoramic city views from its rooftop. Explore the surrounding park afterward.",
+      "visiting_place_image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Golghar_Patna_Bihar_India_%283%29.jpg/1280px-Golghar_Patna_Bihar_India_%283%29.jpg",
+      "lunch_recommendation_places": [
+        {
+          "name": " Pind Balluchi",
+          "cuisine": "North Indian",
+          "price_range": "₹₹"
+        },
+         {
+          "name": " Barbeque Nation",
+          "cuisine": "Barbecue",
+          "price_range": "₹₹₹"
+        },
+        {
+          "name": " KFC",
+          "cuisine": "Fast Food",
+          "price_range": "₹"
+        }
+      ]
+    },
+        {
+      "day": "Day 3",
+      "weather": {
+        "temperature": "17°C/63°F",
+        "condition": "Cloudy",
+        "precipitation_chance": "20%",
+        "humidity": "60%",
+        "recommendation": "Consider indoor activities if it rains. Carry an umbrella."
+      },
+      "visiting_place_name": "Patna Museum",
+      "visiting_place_brief": "A treasure trove of artifacts related to the region's rich history and art.  Explore the Didarganj Yakshi sculpture and other exhibits.",
+      "visiting_place_image_url": "https://upload.wikimedia.org/wikipedia/commons/d/da/Patna_Museum_Building.jpg",
+      "lunch_recommendation_places": [
+        {
+          "name": " Dominos",
+          "cuisine": "Pizza",
+          "price_range": "₹₹"
+        },
+        {
+          "name": "Mainland China",
+          "cuisine": "Chinese",
+          "price_range": "₹₹₹"
+        },
+        {
+          "name": "Subway",
+          "cuisine": "Fast Food",
+          "price_range": "₹"
+        }
+      ]
+    },
+
+
+ {
+      "day": "Day 4",
+      "weather": {
+        "temperature": "16°C/61°F",
+        "condition": "Light Rain",
+        "precipitation_chance": "40%",
+        "humidity": "70%",
+        "recommendation": "Indoor activities are recommended. Visit a museum or explore local markets."
+      },
+      "visiting_place_name": "Sanjay Gandhi Biological Park (Patna Zoo)",
+      "visiting_place_brief": "Home to a variety of animals and a popular spot for families.  Enjoy the diverse flora and fauna, even in light rain.",
+      "visiting_place_image_url": "https://www.patnazoo.in/images/patnazoo/Tiger.jpg",
+
+      "lunch_recommendation_places": [
+        {
+          "name": "7 Plates Restaurant",
+          "cuisine": "Multi-Cuisine",
+          "price_range": "₹₹"
+        },
+                {
+          "name": " Pirates of Grill",
+          "cuisine": "Barbecue",
+          "price_range": "₹₹₹"
+        },
+        {
+          "name": " McDonald's",
+          "cuisine": "Fast Food",
+          "price_range": "₹"
+        }
+
+
+      ]
+    },
+
+
+
+
+    {
+      "day": "Day 5",
+      "weather": {
+        "temperature": "18°C/64°F",
+        "condition": "Partly Cloudy",
+        "precipitation_chance": "15%",
+        "humidity": "60%",
+        "recommendation": "Suitable for outdoor activities.  A good day to explore local markets or parks."
+      },
+      "visiting_place_name": "Mahavir Mandir",
+      "visiting_place_brief": "A significant Hindu temple dedicated to Lord Hanuman, known for its vibrant atmosphere and religious importance.",
+      "visiting_place_image_url": "https://upload.wikimedia.org/wikipedia/commons/6/6b/Mahavir_Mandir_Patna.jpg",
+      "lunch_recommendation_places": [
+         {
+          "name": " Bansi Vihar",
+          "cuisine": "South Indian",
+          "price_range": "₹₹"
+        },
+        {
+          "name": " Yo! China",
+          "cuisine": "Chinese",
+          "price_range": "₹₹₹"
+        },
+         {
+          "name": " Burger King",
+          "cuisine": "Fast Food",
+          "price_range": "₹"
+        }
+      ]
+    }
+  ]
+}
+```
