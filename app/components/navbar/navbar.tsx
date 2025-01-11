@@ -1,11 +1,28 @@
+import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import NavItems from "./nav-items";
 import logo from "/tour-scout.png"; //eslint-disable-line
 import { LuTally3 } from "react-icons/lu";
 
 export default function Navbar() {
+  const [isScrolled, setIsScrolled] = useState<boolean>(false);
+
+  useEffect(() => {
+    window.addEventListener("scroll", () => {
+      if (window.scrollY > 0) return setIsScrolled(true);
+      setIsScrolled(false);
+    });
+
+    return window.removeEventListener("scroll", () => {});
+  }, []);
   return (
-    <div className="fixed top-0 left-0 w-full p-4  flex justify-between md:px-12 bg-background-primary">
+    <div
+      className={`${
+        isScrolled
+          ? "border-b-2 border-neutral-200 backdrop-blur-xl bg-background-primary/30"
+          : "bg-background-primary"
+      } fixed top-0 left-0 w-full p-4  flex justify-between md:px-12  duration-150`}
+    >
       <div className="flex gap-2 items-center">
         <img
           src={logo}

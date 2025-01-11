@@ -1,30 +1,17 @@
 import { Link } from "@remix-run/react";
 import { Button } from "~/components/ui/button";
-
-const navLinks = [
-  {
-    title: "Discover",
-    link: "#discover",
-  },
-  {
-    title: "Trips",
-    link: "#trips",
-  },
-  {
-    title: "Review",
-    link: "#review",
-  },
-];
+import { navItems } from "data/data-without-icon";
+import { NavItemType } from "types/generic.types";
 
 export default function NavItems() {
   return (
-    <div className="flex gap-2 items-center ">
-      {navLinks.map((e, i) => {
+    <div className="flex gap-6 items-center ">
+      {navItems.map((e: NavItemType, i: number) => {
         return (
           <Link
             to={e.link}
             key={i}
-            className="hover:bg-gray-200 rounded-full p-2"
+            className="hover:bg-gray-200 rounded-full p-2 px-4"
           >
             {e.title}
           </Link>

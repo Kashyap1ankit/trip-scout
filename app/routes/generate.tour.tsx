@@ -2,7 +2,7 @@ import type { ActionFunctionArgs, MetaFunction } from "@remix-run/node";
 import { Form } from "@remix-run/react";
 import { useRemixForm, getValidatedFormData } from "remix-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { promptSchema, promptType } from "lib/prompt.validator";
+import { promptSchema, promptType } from "~/lib/prompt.validator";
 import { model, system_prompt } from "constant";
 
 export const meta: MetaFunction = () => {
