@@ -20,8 +20,8 @@ export default function Navbar() {
       className={`${
         isScrolled
           ? "border-b-2 border-neutral-200 backdrop-blur-xl bg-background-primary/30"
-          : "bg-background-primary"
-      } fixed top-0 left-0 w-full p-4  flex justify-between md:px-12  duration-150`}
+          : "bg-background-primary "
+      } fixed top-0 left-0 w-full p-4  flex justify-between md:px-12  duration-150 z-50`}
     >
       <div className="flex gap-2 items-center">
         <img
