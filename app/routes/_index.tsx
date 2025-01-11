@@ -1,5 +1,6 @@
 import type { MetaFunction } from "@remix-run/node";
 import Hero from "~/components/landing/hero";
+import WhyWeExist from "~/components/landing/why-we-exist";
 
 export const meta: MetaFunction = () => {
   return [
@@ -19,8 +20,9 @@ export const meta: MetaFunction = () => {
 
 export default function Index() {
   return (
-    <div>
+    <div className="flex flex-col gap-44">
       <Hero />
+      <WhyWeExist />
     </div>
   );
 }

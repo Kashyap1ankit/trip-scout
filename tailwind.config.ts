@@ -26,6 +26,7 @@ export default {
       colors: {
         "background-primary": "#eff3f6",
         "btn-primary": "#0B2F49",
+        "background-secondary": "#DDE7EE",
       },
     },
   },
