@@ -11,7 +11,7 @@ export default function NavItems() {
           <Link
             to={e.link}
             key={i}
-            className="hover:bg-gray-200  p-2 px-4 text-center border-b-2 md:border-0 rounded-sm md:rounded-full w-full"
+            className="hover:bg-gray-200  p-2 px-4 text-center border-b-2 md:border-0 rounded-0 md:rounded-full w-full"
           >
             {e.title}
           </Link>

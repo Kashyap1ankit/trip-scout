@@ -36,12 +36,7 @@ export default function Reviews() {
               key={index}
               className="relative md:basis-1/2 lg:basis-1/3 mb-12 mx-4"
             >
-              <div className="p-8 rounded-lg rounded-lg z-10 bg-white shadow-xl h-60">
-                {/* <img
-                  src={e.avatar}
-                  alt="logo"
-                  className="w-12 h-12 rounded-full absolute top-0 mx-auto left-[50%] transform -translate-x-1/2 z-20"
-                /> */}
+              <div className="p-8 rounded-lg rounded-lg z-10 bg-white shadow-xl h-72 min-h-fit">
                 <div className="flex flex-col ">
                   <div className="text-center">
                     <p className="text-center font-bold text-xl">{e.name}</p>

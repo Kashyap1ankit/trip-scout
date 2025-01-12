@@ -19,12 +19,12 @@ export default function Footer() {
           <p className="text-sm text-gray-400">@2025 TS INC.</p>
         </div>
 
-        <Form className="flex gap-4 flex-wrap ">
-          <div className="bg-tranparent flex gap-4  items-center  rounded-full border-2 p-4">
+        <Form className="flex gap-4  flex-wrap justify-center ">
+          <div className="bg-tranparent flex gap-2  items-center  rounded-xl border-2 py-2 px-4 w-fit ">
             <FaUserPlus />
             <input
               placeholder="user@gmail.com"
-              className="bg-transparent border-0 outline-0"
+              className="bg-transparent border-0 outline-0 w-fit"
             />
           </div>
           <Button className="bg-green-400 hover:bg-green-400 text-black rounded-full p-6 px-8">

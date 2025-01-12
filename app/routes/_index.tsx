@@ -22,7 +22,7 @@ export const meta: MetaFunction = () => {
 
 export default function Index() {
   return (
-    <div className="flex flex-col gap-44">
+    <div className="flex flex-col gap-24 md:gap-44">
       <Hero />
       <WhyWeExist />
       <Reviews />
