@@ -22,7 +22,7 @@ export const reviews = [
       "The weather-smart planning saved our Tokyo trip! It scheduled indoor activities on rainy days and we didn't waste a single moment. Absolutely brilliant!",
     avatar:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRmCy16nhIbV3pI1qLYHMJKwbH2458oiC9EmA&s", // You'll need to add actual avatar images
-    date: "January 2024",
+    date: "02/02/2025",
   },
   {
     name: "Michael Ross",
@@ -32,7 +32,7 @@ export const reviews = [
       "Found amazing local restaurants in Paris that weren't in any tourist guide. The day-by-day itinerary was perfectly balanced between major sites and hidden gems.",
     avatar:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQoFRQjM-wM_nXMA03AGDXgJK3VeX7vtD3ctA&s",
-    date: "December 2023",
+    date: "13/08/2024",
   },
   {
     name: "Priya Patel",
@@ -41,7 +41,7 @@ export const reviews = [
     comment:
       "Planned my entire Rome vacation in minutes! The hotel recommendations were spot-on and in perfect locations. This is how travel planning should be.",
     avatar: "https://cdn3.pixelcut.app/7/20/uncrop_hero_bdf08a8ca6.jpg",
-    date: "January 2024",
+    date: "01/01/2025",
   },
   {
     name: "David Thompson",
@@ -51,7 +51,7 @@ export const reviews = [
       "The AI suggested a fantastic route through Barcelona that made logical sense. Loved how it adapted when we wanted to spend more time at certain spots.",
     avatar:
       "https://dfstudio-d420.kxcdn.com/wordpress/wp-content/uploads/2019/06/digital_camera_photo-1080x675.jpg",
-    date: "December 2023",
+    date: "27/09/2024",
   },
   {
     name: "Emma Wilson",
@@ -61,6 +61,6 @@ export const reviews = [
       "Used this for our family trip to Seoul and it was perfect! It even suggested indoor alternatives when it rained. Saved me hours of research.",
     avatar:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQUPIfiGgUML8G3ZqsNLHfaCnZK3I5g4tJabQ&s",
-    date: "January 2024",
+    date: "17/10/2023",
   },
 ];

@@ -1,55 +1,64 @@
-import { useEffect, useState } from "react";
+import { useRef } from "react";
 import AnimatedComponent from "../animation";
 import { reviews } from "data/data-without-icon";
-import { motion } from "motion/react";
+
+import Autoplay from "embla-carousel-autoplay";
+
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+} from "~/components/ui/carousel";
+
+import { FaQuoteLeft, FaQuoteRight } from "react-icons/fa";
+
 export default function Reviews() {
-  const [active, setActive] = useState(1);
-  useEffect(() => {
-    setInterval(() => {
-      setActive((prev) => {
-        console.log(prev);
-        if (prev === reviews.length) {
-          return 1;
-        }
-        return prev + 1 / 2;
-      });
-    }, 5000);
-  }, []);
+  const plugin = useRef(Autoplay({ delay: 2000, stopOnInteraction: true }));
+
   return (
     <AnimatedComponent>
       <p className="text-2xl sm:text-3xl  lg:text-5xl font-bold   text-center">
         Recent Reviews
       </p>
-      <button onClick={() => setActive((prev) => prev + 1)}>next</button>
-      <button onClick={() => setActive((prev) => prev - 1)}>prev</button>
-      <div className="relative h-80 mt-12 overflow-hidden ">
-        {reviews.map((e, i) => {
-          return (
-            <motion.div
-              key={i}
-              initial={{
-                opacity: 0.7,
-                x: 20,
-              }}
-              animate={{
-                opacity: 1,
-                x: 0,
-              }}
-              className="absolute w-full h-full "
+      <Carousel
+        plugins={[
+          Autoplay({
+            delay: 5000,
+          }),
+        ]}
+        className="w-full mt-24"
+        onMouseEnter={plugin.current.stop}
+        onMouseLeave={plugin.current.reset}
+      >
+        <CarouselContent>
+          {reviews.map((e, index) => (
+            <CarouselItem
+              key={index}
+              className="relative md:basis-1/2 lg:basis-1/3"
             >
-              <img
-                src={e.avatar}
-                alt={e.name}
-                className="h-full border-2 mx-auto w-3/4 "
-                style={{
-                  transform: `translateX(${(i - (active - 1)) * 100}%)`,
-                  zIndex: active === i + 1 ? 50 : 10,
-                }}
-              />
-            </motion.div>
-          );
-        })}
-      </div>
+              <div className="p-8 rounded-lg rounded-lg z-10 ">
+                <img
+                  src={e.avatar}
+                  alt="logo"
+                  className="w-12 h-12 rounded-full absolute top-0 mx-auto left-[50%] transform -translate-x-1/2 z-20"
+                />
+                <div className="flex flex-col gap- mt-12 ">
+                  <div className="text-center">
+                    <p className="text-center font-bold text-xl">{e.name}</p>
+                    <p className="text-gray-400 italic text-sm">{e.date}</p>
+                  </div>
+
+                  <div className="relative flex flex-col gap-4">
+                    <FaQuoteLeft className="text-yellow-500" />
+                    <p className="mx-4">{e.comment}</p>
+                    <FaQuoteRight className="w-full absolute bottom-0 mx-auto left-[50%] text-yellow-500" />
+                  </div>
+                </div>
+              </div>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+      </Carousel>
     </AnimatedComponent>
   );
 }
