@@ -16,7 +16,7 @@ export default function Reviews() {
   const plugin = useRef(Autoplay({ delay: 2000, stopOnInteraction: true }));
 
   return (
-    <AnimatedComponent>
+    <AnimatedComponent id="review">
       <p className="text-2xl sm:text-3xl  lg:text-5xl font-bold   text-center">
         Recent Reviews
       </p>
@@ -34,15 +34,15 @@ export default function Reviews() {
           {reviews.map((e, index) => (
             <CarouselItem
               key={index}
-              className="relative md:basis-1/2 lg:basis-1/3"
+              className="relative md:basis-1/2 lg:basis-1/3 mb-12 mx-4"
             >
-              <div className="p-8 rounded-lg rounded-lg z-10 ">
-                <img
+              <div className="p-8 rounded-lg rounded-lg z-10 bg-white shadow-xl h-60">
+                {/* <img
                   src={e.avatar}
                   alt="logo"
                   className="w-12 h-12 rounded-full absolute top-0 mx-auto left-[50%] transform -translate-x-1/2 z-20"
-                />
-                <div className="flex flex-col gap- mt-12 ">
+                /> */}
+                <div className="flex flex-col ">
                   <div className="text-center">
                     <p className="text-center font-bold text-xl">{e.name}</p>
                     <p className="text-gray-400 italic text-sm">{e.date}</p>

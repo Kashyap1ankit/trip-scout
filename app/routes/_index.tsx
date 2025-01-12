@@ -1,4 +1,5 @@
 import type { MetaFunction } from "@remix-run/node";
+import Footer from "~/components/footer";
 import Hero from "~/components/landing/hero";
 import Reviews from "~/components/landing/reviews";
 import WhyWeExist from "~/components/landing/why-we-exist";
@@ -25,6 +26,7 @@ export default function Index() {
       <Hero />
       <WhyWeExist />
       <Reviews />
+      <Footer />
     </div>
   );
 }

@@ -32,7 +32,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body className="w-11/12 bg-background-primary  max-w-7xl mx-auto  min-h-screen mb-12">
+      <body className="w-11/12 bg-background-primary  max-w-7xl mx-auto  min-h-screen pb-2">
         <Navbar />
         <div className="mt-28 md:mt-44">{children}</div>
         <ScrollRestoration />

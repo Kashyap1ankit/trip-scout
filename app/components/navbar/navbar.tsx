@@ -3,6 +3,14 @@ import { Button } from "../ui/button";
 import NavItems from "./nav-items";
 import logo from "/tour-scout.png"; //eslint-disable-line
 import { LuTally3 } from "react-icons/lu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "~/components/ui/dialog";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState<boolean>(false);
@@ -37,7 +45,19 @@ export default function Navbar() {
       </div>
 
       <div className="md:hidden">
-        <LuTally3 className="rotate-90 size-6" />
+        <Dialog>
+          <DialogTrigger>
+            <LuTally3 className="rotate-90 size-6" />
+          </DialogTrigger>
+          <DialogContent className="mx-auto rounded-lg w-11/12 md:hidden">
+            <DialogHeader>
+              <DialogTitle className="sr-only"></DialogTitle>
+              <DialogDescription>
+                <NavItems />
+              </DialogDescription>
+            </DialogHeader>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <Button className="bg-btn-primary hover:bg-btn-primary rounded-full hidden md:block px-4">

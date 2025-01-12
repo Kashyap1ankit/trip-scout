@@ -5,20 +5,20 @@ import { NavItemType } from "types/generic.types";
 
 export default function NavItems() {
   return (
-    <div className="flex gap-6 items-center ">
+    <div className="flex flex-col md:flex-row gap-6 items-center ">
       {navItems.map((e: NavItemType, i: number) => {
         return (
           <Link
             to={e.link}
             key={i}
-            className="hover:bg-gray-200 rounded-full p-2 px-4"
+            className="hover:bg-gray-200  p-2 px-4 text-center border-b-2 md:border-0 rounded-sm md:rounded-full w-full"
           >
             {e.title}
           </Link>
         );
       })}
 
-      <Button className="bg-btn-primary hover:bg-btn-primary rounded-md md:hidden px-4">
+      <Button className="bg-btn-primary hover:bg-btn-primary rounded-md md:hidden px-4 w-full">
         <p className="font-bold text-sm">Plan Now</p>
       </Button>
     </div>

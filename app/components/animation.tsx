@@ -5,10 +5,12 @@ export default function AnimatedComponent({
   delay,
   className,
   props,
+  id,
 }: {
   children: React.ReactNode;
   delay?: number;
   className?: string;
+  id?: string;
   props?: any; //eslint-disable-line
 }) {
   return (
@@ -25,6 +27,7 @@ export default function AnimatedComponent({
       viewport={{ once: true }}
       className={className}
       {...props}
+      id={id}
     >
       {children}
     </motion.div>

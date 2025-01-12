@@ -1,3 +1,4 @@
+import { FaGithub, FaLinkedin, FaTwitter } from "react-icons/fa";
 import {
   LuBedDouble,
   LuClock,
@@ -66,5 +67,20 @@ export const whyWeExist = [
     description:
       "Find the perfect place to stay with curated hotel suggestions based on your destination, featuring verified reviews and strategic locations.",
     icon: LuBedDouble,
+  },
+];
+
+export const socialLinks = [
+  {
+    icon: FaLinkedin,
+    link: "https://www.linkedin.com/in/ankit-kashyap-coder/",
+  },
+  {
+    icon: FaTwitter,
+    link: "https://x.com/kashyap_tweetts",
+  },
+  {
+    icon: FaGithub,
+    link: "https://github.com/Kashyap1ankit",
   },
 ];
