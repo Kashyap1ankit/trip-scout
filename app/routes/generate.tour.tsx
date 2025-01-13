@@ -1,18 +1,41 @@
 import type { ActionFunctionArgs, MetaFunction } from "@remix-run/node";
-import { Form } from "@remix-run/react";
+import { Form, useLoaderData } from "@remix-run/react";
 import { useRemixForm, getValidatedFormData } from "remix-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { promptSchema, promptType } from "~/lib/prompt.validator";
 import { model, system_prompt } from "constant";
+import axios from "axios";
+
+import {
+  Command,
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+  CommandShortcut,
+} from "~/components/ui/command";
+import { useEffect, useState } from "react";
 
 export const meta: MetaFunction = () => {
   return [{ title: "Generate" }, { name: "Generate page for trip" }];
 };
 const resolver = zodResolver(promptSchema);
 
+export const loader = async () => {
+  return Response.json({
+    env: {
+      GEO_API_KEY: process.env.GEO_API_KEY,
+    },
+  });
+};
+
 export async function action({ request }: ActionFunctionArgs) {
   try {
     const data = await getValidatedFormData<promptType>(request, resolver);
+    console.log(data);
     if (data.errors) throw new Error("Validation error");
 
     const prompt = system_prompt(
@@ -23,8 +46,8 @@ export async function action({ request }: ActionFunctionArgs) {
       data.data.travel_style
     );
 
-    const result = await model.generateContent(prompt);
-    console.log("gemini", result.response.text());
+    // const result = await model.generateContent(prompt);
+    // console.log("gemini", result.response.text());
 
     return Response.json({ message: "Success", data, status: 200 });
   } catch (error) {
@@ -32,11 +55,54 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 }
 
+const cityDataFake = [
+  {
+    properties: {
+      formatted: "Patna, Bihar",
+    },
+  },
+  {
+    properties: {
+      formatted: "Patna2, Bihar2",
+    },
+  },
+  {
+    properties: {
+      formatted: "Patna3, Bihar3",
+    },
+  },
+  {
+    properties: {
+      formatted: "Patna4, Bihar4",
+    },
+  },
+];
+
 export default function GenerateTour() {
+  const { env } = useLoaderData();
+
+  const [cityData, setCityData] = useState<any>([]);
+
   const data = useRemixForm<promptType>({
     mode: "onSubmit",
     resolver,
   });
+
+  let timer: Timeout;
+
+  // async function handleGeoRequest(cityName: string) {
+  //   if (timer) clearTimeout(timer);
+  //   timer = setTimeout(async () => {
+  //     const response = await axios.get(
+  //       `https://api.geoapify.com/v1/geocode/autocomplete?text=${cityName}&apiKey=${env.GEO_API_KEY}`,
+  //       {}
+  //     );
+  //     console.log("response", response);
+  //     const allResponse = await response.data.features;
+  //     console.log("allResponse", allResponse);
+  //     setCityData(allResponse);
+  //   }, 2000);
+  // }
 
   return (
     <div>
@@ -45,11 +111,34 @@ export default function GenerateTour() {
         onSubmit={data.handleSubmit}
         method="POST"
       >
-        <input
-          {...data.register("city_name")}
-          placeholder="Enter city name "
-          className="border-2 border-neutral-400 p-2 rounded-md outline-0 w-fit"
-        />
+        <Command>
+          <CommandInput
+            placeholder="Type a command or search..."
+            onChangeCapture={(e) => {
+              data.setValue("city_name", e.target.value);
+              handleGeoRequest(e.target.value);
+            }}
+          />
+          <CommandList>
+            <CommandEmpty>No results found.</CommandEmpty>
+            <CommandGroup heading="Suggestions">
+              {cityDataFake.map((e, i) => {
+                return (
+                  <CommandItem
+                    key={i}
+                    onClickCapture={(e) => {
+                      data.setValue("city_name", e.target.innerText);
+                    }}
+                  >
+                    {e.properties.formatted}
+                  </CommandItem>
+                );
+              })}
+            </CommandGroup>
+            <CommandSeparator />
+          </CommandList>
+        </Command>
+
         {data.formState.errors.city_name && (
           <p>{data.formState.errors.city_name.message}</p>
         )}
