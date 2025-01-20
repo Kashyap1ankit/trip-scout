@@ -9,11 +9,8 @@ import { Calendar } from "react-calendar";
 import { format } from "date-fns";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-type ValuePiece = Date | null;
-
-type Value = ValuePiece | [ValuePiece, ValuePiece];
 // import { model, system_prompt } from "constant";
-// import axios from "axios";
+import axios from "axios";
 
 // import {
 //   Command,
@@ -65,70 +62,60 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 }
 
-// const cityDataFake = [
-//   {
-//     properties: {
-//       formatted: "Patna, Bihar",
-//     },
-//   },
-//   {
-//     properties: {
-//       formatted: "Patna2, Bihar2",
-//     },
-//   },
-//   {
-//     properties: {
-//       formatted: "Patna3, Bihar3",
-//     },
-//   },
-//   {
-//     properties: {
-//       formatted: "Patna4, Bihar4",
-//     },
-//   },
-// ];
+const tripType = [
+  "Adventure",
+  "Family-Friendly",
+  "Friends-Trip",
+  "Solo",
+  "Partner-Trip",
+];
 
 export default function GenerateTour() {
-  // const { env } = useLoaderData();
-  // const [cityData, setCityData] = useState<any>([]);
+  const { env } = useLoaderData();
+  const [cityDataFake, setCityDataFake] = useState([
+    { properties: { formatted: "" } },
+  ]);
 
   const [searchParams, setSearchParams] = useSearchParams();
   const currentStep = searchParams.get("step");
-
+  const [activeTripStyle, setActiveStyle] = useState();
   const data = useRemixForm<promptType>({
     mode: "onSubmit",
     resolver,
   });
-  const [value, onChange] = useState<Value>(new Date());
-  const [endValue, endOnChange] = useState<Value>(new Date());
-  // let timer: Timeout;
 
-  // async function handleGeoRequest(cityName: string) {
-  //   if (timer) clearTimeout(timer);
-  //   timer = setTimeout(async () => {
-  //     const response = await axios.get(
-  //       `https://api.geoapify.com/v1/geocode/autocomplete?text=${cityName}&apiKey=${env.GEO_API_KEY}`,
-  //       {}
-  //     );
-  //     console.log("response", response);
-  //     const allResponse = await response.data.features;
-  //     console.log("allResponse", allResponse);
-  //     setCityData(allResponse);
-  //   }, 2000);
-  // }
+  let timer: Timeout;
+
+  async function handleGeoRequest(cityName: string) {
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(async () => {
+      const response = await axios.get(
+        `https://api.geoapify.com/v1/geocode/autocomplete?text=${cityName}&apiKey=${env.GEO_API_KEY}`,
+        {}
+      );
+      console.log("response", response);
+      const allResponse = await response.data.features;
+      console.log("allResponse", allResponse);
+      setCityDataFake(allResponse);
+    }, 2000);
+  }
 
   const fieldValues = ["city_name", ["start_date", "end_date"], "travel_style"];
 
   async function handleNextStep(step: number) {
     try {
       console.log(data.getValues("start_date"));
+      console.log(data.getValues("end_date"));
       const output = await data.trigger(fieldValues[step]);
       console.log("output", output);
 
       if (output) {
-        const params = new URLSearchParams();
-        params.set("step", String(Number(currentStep) + 1));
-        setSearchParams(params, { preventScrollReset: true });
+        if (currentStep !== "3") {
+          const params = new URLSearchParams();
+          params.set("step", String(Number(currentStep) + 1));
+          setSearchParams(params, { preventScrollReset: true });
+          return;
+        }
       }
     } catch (error) {
       console.log(error);
@@ -143,13 +130,67 @@ export default function GenerateTour() {
     }
   }, []);
 
-  const start_date_value = data.getValues("start_date");
-  const end_date_value = data.getValues("end_date");
+  // [
+  //   {
+  //     properties: {
+  //       formatted: "Patna, Bihar",
+  //     },
+  //   },
+  //   {
+  //     properties: {
+  //       formatted: "Patna2, Bihar2",
+  //     },
+  //   },
+  //   {
+  //     properties: {
+  //       formatted: "Patna3, Bihar3",
+  //     },
+  //   },
+  //   {
+  //     properties: {
+  //       formatted: "Patna4, Bihar4",
+  //     },
+  //   },
+  // ]
+
+  const [activeValue, setActiveValue] = useState(0);
 
   return (
-    <div className="border-2">
-      <div className="mx-auto text-center text-gray-400 font-bold text-sm">
-        Step {currentStep}/3
+    <div>
+      <div className="flex justify-between items-center">
+        <ChevronLeft
+          className="cursor-pointer w-10 h-10 hover:bg-gray-300 p-2 rounded-full"
+          onClick={() => {
+            if (
+              currentStep &&
+              Number(currentStep) > 1 &&
+              Number(currentStep) <= 3
+            ) {
+              const params = new URLSearchParams();
+              params.set("step", (Number(currentStep) - 1).toString());
+              setSearchParams(params, { preventScrollReset: true });
+            }
+          }}
+        />
+
+        <div className=" text-gray-400 font-bold text-sm">
+          Step {currentStep}/3
+        </div>
+
+        <ChevronRight
+          className="cursor-pointer w-10 h-10 hover:bg-gray-300 p-2 rounded-full"
+          onClick={() => {
+            if (
+              currentStep &&
+              Number(currentStep) >= 1 &&
+              Number(currentStep) < 3
+            ) {
+              const params = new URLSearchParams();
+              params.set("step", (Number(currentStep) + 1).toString());
+              setSearchParams(params, { preventScrollReset: true });
+            }
+          }}
+        />
       </div>
 
       <Form
@@ -173,7 +214,31 @@ export default function GenerateTour() {
               <input
                 {...data.register("city_name")}
                 className="border-2 border-neutral-400 p-2  outline-0 w-full rounded-full"
+                onChangeCapture={(e) => {
+                  console.log("value", e.target.key);
+                }}
+                onKeyDownCapture={(e) => {
+                  console.log(e.key);
+                  if (
+                    e.key === "ArrowDown" &&
+                    activeValue < cityDataFake.length - 1
+                  ) {
+                    return setActiveValue((prev) => prev + 1);
+                  }
+
+                  if (e.key === "ArrowUp" && activeValue > 0) {
+                    return setActiveValue((prev) => prev - 1);
+                  }
+                }}
+                value={cityDataFake[activeValue].properties.formatted}
               />
+
+              <ul className="bg-gray-400 text-center">
+                {cityDataFake.length > 0 &&
+                  cityDataFake.map((e, i) => {
+                    return <li key={i}>{e.properties.formatted}</li>;
+                  })}
+              </ul>
 
               {data.formState.errors.city_name && (
                 <p className="text-red-500">
@@ -183,6 +248,8 @@ export default function GenerateTour() {
             </div>
           </div>
         ) : null}
+
+        {/* Calendar Part  */}
 
         {currentStep === "2" ? (
           <div>
@@ -195,14 +262,19 @@ export default function GenerateTour() {
               </p>
             </div>
 
-            <div className="flex  gap-12 bg-transparent mt-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 bg-transparent mt-12">
               <div>
                 <Calendar
                   {...data.register("start_date")}
-                  onChange={(e) => data.setValue("start_date", e)}
-                  value={start_date_value}
-                  className="!w-fit bg-white shadow-none"
-                  tileClassName="text-sm p-2 rounded-full hover:bg-gray-100 transition-colors"
+                  onChange={(e) =>
+                    data.setValue(
+                      "start_date",
+                      new Date(e).toISOString().split("T")[0]
+                    )
+                  }
+                  value={new Date().toISOString().split("T")[0]}
+                  className="!w-fit !bg-transparent !border-0 shadow-none"
+                  tileClassName="text-sm p-2 rounded-full hover:bg-gray-100 "
                   navigationLabel={({ date }) => (
                     <span className="text-lg font-medium">
                       {format(date, "MMMM yyyy")}
@@ -228,9 +300,14 @@ export default function GenerateTour() {
               <div>
                 <Calendar
                   {...data.register("end_date")}
-                  onChange={(e) => data.setValue("end_date", e)}
-                  value={endValue}
-                  className="!w-auto bg-white shadow-none"
+                  onChange={(e) =>
+                    data.setValue(
+                      "end_date",
+                      new Date(e).toISOString().split("T")[0]
+                    )
+                  }
+                  value={new Date().toISOString().split("T")[0]}
+                  className="!w-fit !bg-transparent !border-0  shadow-none"
                   tileClassName="text-sm p-2 rounded-full hover:bg-gray-100 transition-colors"
                   navigationLabel={({ date }) => (
                     <span className="text-lg font-medium">
@@ -245,11 +322,13 @@ export default function GenerateTour() {
                   tileContent={null}
                   formatShortWeekday={(locale, date) => format(date, "EEEEE")}
                   formatDay={(locale, date) => format(date, "d")}
-                  minDate={
-                    value
-                      ? new Date(value.getTime() + 24 * 60 * 60 * 1000)
-                      : new Date()
-                  }
+                  // minDate={
+                  //   start_date_value
+                  //     ? new Date(
+                  //         start_date_value.getTime() + 24 * 60 * 60 * 1000
+                  //       )
+                  //     : new Date()
+                  // }
                 />
 
                 {data.formState.errors.end_date && (
@@ -261,17 +340,42 @@ export default function GenerateTour() {
             </div>
           </div>
         ) : null}
-
         {currentStep === "3" ? (
           <div>
-            <input
-              {...data.register("travel_style")}
-              placeholder="travel_style"
-              className="border-2 border-neutral-400 p-2 rounded-md outline-0 w-fit"
-            />
-            {data.formState.errors.travel_style && (
-              <p>{data.formState.errors.travel_style.message}</p>
-            )}
+            <div>
+              <p className="text-2xl sm:text-3xl md:text-5xl font-bold">
+                What kind of travelling you want to do?
+              </p>
+              <p className="text-center text-gray-500 mt-6 ">
+                Select Any one !
+              </p>
+            </div>
+
+            <div className="group mt-12 grid grid-cols-3  gap-12 self-center">
+              {tripType.map((e, i) => {
+                return (
+                  //eslint-disable-next-line
+                  <div
+                    onClick={() => {
+                      setActiveStyle(e);
+                      data.setValue("travel_style", e.toString());
+                    }}
+                    key={i}
+                    d
+                    data-active={activeTripStyle === e}
+                    className={`duration-500 border-2 rounded-full p-6 text-center cursor-pointer data-[active=true]:bg-green-400`}
+                  >
+                    {e}
+                  </div>
+                );
+              })}
+
+              {data.formState.errors.travel_style && (
+                <p className="text-red-500">
+                  {data.formState.errors.travel_style.message}
+                </p>
+              )}
+            </div>
           </div>
         ) : null}
         {currentStep === "3" ? (
@@ -284,8 +388,10 @@ export default function GenerateTour() {
         ) : (
           //eslint-disable-next-line
           <div
-            className=" border-0 bg-violet-700 text-white p-2 px-8 rounded-full shadow-xl cursor-pointer"
-            onClick={() => handleNextStep(Number(currentStep) - 1)}
+            className={` border-0 bg-violet-700 text-white p-2 px-8 rounded-full shadow-xl cursor-pointer `}
+            onClick={() => {
+              handleNextStep(Number(currentStep) - 1);
+            }}
           >
             Next
           </div>
