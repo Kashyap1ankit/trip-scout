@@ -1,9 +1,10 @@
-import { Link } from "@remix-run/react";
+import { Link, useNavigate } from "@remix-run/react";
 import { Button } from "~/components/ui/button";
 import { navItems } from "data/data-without-icon";
 import { NavItemType } from "types/generic.types";
 
 export default function NavItems() {
+  const navigate = useNavigate();
   return (
     <div className="flex flex-col md:flex-row gap-6 items-center ">
       {navItems.map((e: NavItemType, i: number) => {
@@ -18,7 +19,10 @@ export default function NavItems() {
         );
       })}
 
-      <Button className="bg-btn-primary hover:bg-btn-primary rounded-md md:hidden px-4 w-full">
+      <Button
+        className="bg-btn-primary hover:bg-btn-primary rounded-md md:hidden px-4 w-full"
+        onClick={() => navigate("/generate/tour?step=1")}
+      >
         <p className="font-bold text-sm">Plan Now</p>
       </Button>
     </div>

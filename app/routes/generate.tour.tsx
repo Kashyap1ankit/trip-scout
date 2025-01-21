@@ -1,29 +1,21 @@
 import type { ActionFunctionArgs, MetaFunction } from "@remix-run/node";
-import { Form, useLoaderData, useSearchParams } from "@remix-run/react";
+import {
+  Form,
+  useLoaderData,
+  useNavigate,
+  useSearchParams,
+} from "@remix-run/react";
 import { useRemixForm, getValidatedFormData } from "remix-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { promptSchema, promptType } from "~/lib/prompt.validator";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "react-calendar/dist/Calendar.css";
 import { Calendar } from "react-calendar";
 import { format } from "date-fns";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, History, Search } from "lucide-react";
 
 // import { model, system_prompt } from "constant";
 import axios from "axios";
-
-// import {
-//   Command,
-//   CommandDialog,
-//   CommandEmpty,
-//   CommandGroup,
-//   CommandInput,
-//   CommandItem,
-//   CommandList,
-//   CommandSeparator,
-//   CommandShortcut,
-// } from "~/components/ui/command";
-// import { useEffect, useState } from "react";
 
 export const meta: MetaFunction = () => {
   return [{ title: "Generate" }, { name: "Generate page for trip" }];
@@ -71,28 +63,35 @@ const tripType = [
 ];
 
 export default function GenerateTour() {
+  const navigate = useNavigate();
   const { env } = useLoaderData();
-  const [cityDataFake, setCityDataFake] = useState([
-    { properties: { formatted: "" } },
-  ]);
+  const [citySearch, setCitySearch] = useState();
+  const [cityDataFake, setCityDataFake] = useState<any>([]);
 
   const [searchParams, setSearchParams] = useSearchParams();
   const currentStep = searchParams.get("step");
   const [activeTripStyle, setActiveStyle] = useState();
+
   const data = useRemixForm<promptType>({
     mode: "onSubmit",
     resolver,
   });
 
-  let timer: Timeout;
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   async function handleGeoRequest(cityName: string) {
-    if (timer) clearTimeout(timer);
-    timer = setTimeout(async () => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(async () => {
+      if (cityName.trim() === "") {
+        setCityDataFake([]);
+        return;
+      }
+
       const response = await axios.get(
         `https://api.geoapify.com/v1/geocode/autocomplete?text=${cityName}&apiKey=${env.GEO_API_KEY}`,
         {}
       );
+
       console.log("response", response);
       const allResponse = await response.data.features;
       console.log("allResponse", allResponse);
@@ -104,8 +103,7 @@ export default function GenerateTour() {
 
   async function handleNextStep(step: number) {
     try {
-      console.log(data.getValues("start_date"));
-      console.log(data.getValues("end_date"));
+      console.log(data.getValues("city_name"));
       const output = await data.trigger(fieldValues[step]);
       console.log("output", output);
 
@@ -130,30 +128,7 @@ export default function GenerateTour() {
     }
   }, []);
 
-  // [
-  //   {
-  //     properties: {
-  //       formatted: "Patna, Bihar",
-  //     },
-  //   },
-  //   {
-  //     properties: {
-  //       formatted: "Patna2, Bihar2",
-  //     },
-  //   },
-  //   {
-  //     properties: {
-  //       formatted: "Patna3, Bihar3",
-  //     },
-  //   },
-  //   {
-  //     properties: {
-  //       formatted: "Patna4, Bihar4",
-  //     },
-  //   },
-  // ]
-
-  const [activeValue, setActiveValue] = useState(0);
+  const [activeValue, setActiveValue] = useState(-1);
 
   return (
     <div>
@@ -211,34 +186,63 @@ export default function GenerateTour() {
             </div>
 
             <div>
-              <input
-                {...data.register("city_name")}
-                className="border-2 border-neutral-400 p-2  outline-0 w-full rounded-full"
-                onChangeCapture={(e) => {
-                  console.log("value", e.target.key);
-                }}
-                onKeyDownCapture={(e) => {
-                  console.log(e.key);
-                  if (
-                    e.key === "ArrowDown" &&
-                    activeValue < cityDataFake.length - 1
-                  ) {
-                    return setActiveValue((prev) => prev + 1);
-                  }
+              <div className="flex items-center gap-4 border-2 border-neutral-400 p-2  outline-0 w-full rounded-full">
+                <Search />
+                <input
+                  {...data.register("city_name")}
+                  className="w-full bg-transparent outline-0 border-0"
+                  onChange={(e) => {
+                    setCitySearch(e.target.value);
+                    handleGeoRequest(e.target.value);
+                  }}
+                  onKeyDownCapture={(e) => {
+                    if (
+                      e.key === "ArrowDown" &&
+                      activeValue < cityDataFake.length - 1
+                    ) {
+                      setActiveValue((prev) => {
+                        const newValue = prev + 1;
+                        setCitySearch(
+                          cityDataFake[newValue].properties.formatted
+                        );
+                        return newValue;
+                      });
+                    }
 
-                  if (e.key === "ArrowUp" && activeValue > 0) {
-                    return setActiveValue((prev) => prev - 1);
-                  }
-                }}
-                value={cityDataFake[activeValue].properties.formatted}
-              />
-
-              <ul className="bg-gray-400 text-center">
-                {cityDataFake.length > 0 &&
-                  cityDataFake.map((e, i) => {
-                    return <li key={i}>{e.properties.formatted}</li>;
+                    if (e.key === "ArrowUp" && activeValue > 0) {
+                      setActiveValue((prev) => {
+                        const newValue = prev - 1;
+                        setCitySearch(
+                          cityDataFake[newValue].properties.formatted
+                        );
+                        return newValue;
+                      });
+                    }
+                  }}
+                  value={citySearch}
+                />
+              </div>
+              {cityDataFake.length > 0 && (
+                <ul className="mt-2 bg-white py-4 flex flex-col gap-4 px-12 rounded-md">
+                  {cityDataFake.map((e, i) => {
+                    return (
+                      //eslint-disable-next-line
+                      <div
+                        key={i}
+                        className="flex gap-4 items-center bg-tranparent cursor-pointer hover:bg-gray-300 p-4 rounded-full"
+                        onClick={() => {
+                          setCitySearch(e.properties.formatted);
+                          data.setValue("city_name", e.properties.formatted);
+                          navigate("/generate/tour?step=2");
+                        }}
+                      >
+                        <History className="size-4 text-gray-400" />
+                        <li>{e.properties.formatted}</li>
+                      </div>
+                    );
                   })}
-              </ul>
+                </ul>
+              )}
 
               {data.formState.errors.city_name && (
                 <p className="text-red-500">
@@ -361,7 +365,6 @@ export default function GenerateTour() {
                       data.setValue("travel_style", e.toString());
                     }}
                     key={i}
-                    d
                     data-active={activeTripStyle === e}
                     className={`duration-500 border-2 rounded-full p-6 text-center cursor-pointer data-[active=true]:bg-green-400`}
                   >

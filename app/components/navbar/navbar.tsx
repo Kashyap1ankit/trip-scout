@@ -11,9 +11,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "~/components/ui/dialog";
+import { useNavigate } from "@remix-run/react";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState<boolean>(false);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     window.addEventListener("scroll", () => {
@@ -31,7 +34,11 @@ export default function Navbar() {
           : "bg-background-primary "
       } fixed top-0 left-0 w-full p-4  flex justify-between md:px-12  duration-150 z-50`}
     >
-      <div className="flex gap-2 items-center">
+      {/* eslint-disable-next-line  */}
+      <div
+        className="flex gap-2 items-center cursor-pointer"
+        onClick={() => navigate("/")}
+      >
         <img
           src={logo}
           alt="logo-img"
@@ -60,7 +67,10 @@ export default function Navbar() {
         </Dialog>
       </div>
 
-      <Button className="bg-btn-primary hover:bg-btn-primary rounded-full hidden md:block px-4">
+      <Button
+        className="bg-btn-primary hover:bg-btn-primary rounded-full hidden md:block px-4"
+        onClick={() => navigate("/generate/tour?step=1")}
+      >
         <p className="font-bold text-sm">Plan Now</p>
       </Button>
     </div>
