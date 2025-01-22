@@ -1,8 +1,13 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+export const tripType = [
+  "Adventure",
+  "Family-Friendly",
+  "Friends-Trip",
+  "Solo",
+  "Partner-Trip",
+];
 
 export const system_prompt = (
   city_name: string,
-  number_of_days: number,
   start_date: Date | string,
   end_date: Date | string,
   travel_style: string
@@ -11,7 +16,6 @@ export const system_prompt = (
 You are an expert travel planner with deep knowledge of global destinations. Generate a detailed, personalized travel itinerary based on the following parameters:
 
 DESTINATION: ${city_name}
-DURATION: ${number_of_days} days
 TRAVEL_DATES: ${start_date} to ${end_date}
 TRAVEL_STYLE: ${travel_style}
 
@@ -100,6 +104,3 @@ Constraints:
 
 Note: All responses must strictly adhere to this JSON structure for proper parsing and display in the application interface.`;
 };
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
-export const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });

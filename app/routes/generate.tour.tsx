@@ -13,15 +13,14 @@ import "react-calendar/dist/Calendar.css";
 import { Calendar } from "react-calendar";
 import { format } from "date-fns";
 import { ChevronLeft, ChevronRight, History, Search } from "lucide-react";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// import { model, system_prompt } from "constant";
+import { tripType, system_prompt } from "constant";
 import axios from "axios";
 
 export const meta: MetaFunction = () => {
   return [{ title: "Generate" }, { name: "Generate page for trip" }];
 };
-
-const resolver = zodResolver(promptSchema);
 
 export const loader = async () => {
   return Response.json({
@@ -30,23 +29,25 @@ export const loader = async () => {
     },
   });
 };
+const resolver = zodResolver(promptSchema);
 
 export async function action({ request }: ActionFunctionArgs) {
   try {
     const data = await getValidatedFormData<promptType>(request, resolver);
-    console.log(data);
     if (data.errors) throw new Error("Validation error");
 
-    // const prompt = system_prompt(
-    //   data.data.city_name,
-    //   data.data.number_of_days,
-    //   data.data.start_date,
-    //   data.data.end_date,
-    //   data.data.travel_style
-    // );
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
 
-    // const result = await model.generateContent(prompt);
-    // console.log("gemini", result.response.text());
+    const prompt = system_prompt(
+      data.data.city_name,
+      data.data.start_date,
+      data.data.end_date,
+      data.data.travel_style
+    );
+
+    const result = await model.generateContent(prompt);
+    console.log("gemini", result.response.text());
 
     return Response.json({ message: "Success", data, status: 200 });
   } catch (error) {
@@ -54,24 +55,24 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 }
 
-const tripType = [
-  "Adventure",
-  "Family-Friendly",
-  "Friends-Trip",
-  "Solo",
-  "Partner-Trip",
-];
-
 export default function GenerateTour() {
   const navigate = useNavigate();
-  const { env } = useLoaderData();
-  const [citySearch, setCitySearch] = useState();
-  const [cityDataFake, setCityDataFake] = useState<any>([]);
-
+  const {
+    env,
+  }: {
+    env: {
+      GEO_API_KEY: string;
+    };
+  } = useLoaderData();
+  const [citySearchQuery, setCitySearchQuery] = useState<string>();
+  const [cityData, setCityData] = useState<any>([]); //eslint-disable-line
   const [searchParams, setSearchParams] = useSearchParams();
   const currentStep = searchParams.get("step");
-  const [activeTripStyle, setActiveStyle] = useState();
+  const [ddActiveIndex, setDDActiveIndex] = useState<number>(-1);
+  const [activeTripStyle, setActiveStyle] = useState<string | null>();
 
+  const [startDate, setStartDate] = useState();
+  const [endDate, setEndDate] = useState();
   const data = useRemixForm<promptType>({
     mode: "onSubmit",
     resolver,
@@ -83,7 +84,7 @@ export default function GenerateTour() {
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(async () => {
       if (cityName.trim() === "") {
-        setCityDataFake([]);
+        setCityData([]);
         return;
       }
 
@@ -92,20 +93,21 @@ export default function GenerateTour() {
         {}
       );
 
-      console.log("response", response);
       const allResponse = await response.data.features;
-      console.log("allResponse", allResponse);
-      setCityDataFake(allResponse);
+      setCityData(allResponse);
     }, 2000);
   }
 
-  const fieldValues = ["city_name", ["start_date", "end_date"], "travel_style"];
+  //eslint-disable-next-line
+  const fieldValues: any = [
+    "city_name",
+    ["start_date", "end_date"],
+    "travel_style",
+  ];
 
   async function handleNextStep(step: number) {
     try {
-      console.log(data.getValues("city_name"));
       const output = await data.trigger(fieldValues[step]);
-      console.log("output", output);
 
       if (output) {
         if (currentStep !== "3") {
@@ -127,8 +129,6 @@ export default function GenerateTour() {
       setSearchParams(params, { preventScrollReset: true });
     }
   }, []);
-
-  const [activeValue, setActiveValue] = useState(-1);
 
   return (
     <div>
@@ -192,55 +192,64 @@ export default function GenerateTour() {
                   {...data.register("city_name")}
                   className="w-full bg-transparent outline-0 border-0"
                   onChange={(e) => {
-                    setCitySearch(e.target.value);
+                    setCitySearchQuery(e.target.value);
                     handleGeoRequest(e.target.value);
                   }}
                   onKeyDownCapture={(e) => {
                     if (
                       e.key === "ArrowDown" &&
-                      activeValue < cityDataFake.length - 1
+                      ddActiveIndex < cityData.length - 1
                     ) {
-                      setActiveValue((prev) => {
+                      setDDActiveIndex((prev) => {
                         const newValue = prev + 1;
-                        setCitySearch(
-                          cityDataFake[newValue].properties.formatted
+                        setCitySearchQuery(
+                          cityData[newValue].properties.formatted
                         );
                         return newValue;
                       });
                     }
 
-                    if (e.key === "ArrowUp" && activeValue > 0) {
-                      setActiveValue((prev) => {
+                    if (e.key === "ArrowUp" && ddActiveIndex > 0) {
+                      setDDActiveIndex((prev) => {
                         const newValue = prev - 1;
-                        setCitySearch(
-                          cityDataFake[newValue].properties.formatted
+                        setCitySearchQuery(
+                          cityData[newValue].properties.formatted
                         );
                         return newValue;
                       });
                     }
                   }}
-                  value={citySearch}
+                  value={citySearchQuery}
                 />
               </div>
-              {cityDataFake.length > 0 && (
-                <ul className="mt-2 bg-white py-4 flex flex-col gap-4 px-12 rounded-md">
-                  {cityDataFake.map((e, i) => {
-                    return (
-                      //eslint-disable-next-line
-                      <div
-                        key={i}
-                        className="flex gap-4 items-center bg-tranparent cursor-pointer hover:bg-gray-300 p-4 rounded-full"
-                        onClick={() => {
-                          setCitySearch(e.properties.formatted);
-                          data.setValue("city_name", e.properties.formatted);
-                          navigate("/generate/tour?step=2");
-                        }}
-                      >
-                        <History className="size-4 text-gray-400" />
-                        <li>{e.properties.formatted}</li>
-                      </div>
-                    );
-                  })}
+              {cityData.length > 0 && (
+                <ul className="mt-2 bg-white py-4 flex flex-col gap-4 px-12 rounded-md duration-300">
+                  {cityData.map(
+                    (
+                      e: {
+                        properties: {
+                          formatted: string;
+                        };
+                      },
+                      i: number
+                    ) => {
+                      return (
+                        //eslint-disable-next-line
+                        <div
+                          key={i}
+                          className="flex gap-4 items-center bg-tranparent cursor-pointer hover:bg-gray-300 p-4 rounded-full"
+                          onClick={() => {
+                            setCitySearchQuery(e.properties.formatted);
+                            data.setValue("city_name", e.properties.formatted);
+                            navigate("/generate/tour?step=2");
+                          }}
+                        >
+                          <History className="size-4 text-gray-400" />
+                          <li>{e.properties.formatted}</li>
+                        </div>
+                      );
+                    }
+                  )}
                 </ul>
               )}
 
@@ -266,52 +275,25 @@ export default function GenerateTour() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 bg-transparent mt-12">
+            <div className="grid grid-cols-1 md:grid-cols-2  gap-12 bg-transparent mt-12">
               <div>
                 <Calendar
                   {...data.register("start_date")}
-                  onChange={(e) =>
+                  onChange={(
+                    e: any //eslint-disable-line
+                  ) => {
+                    setStartDate(e);
                     data.setValue(
                       "start_date",
                       new Date(e).toISOString().split("T")[0]
-                    )
+                    );
+                  }}
+                  value={
+                    startDate
+                      ? startDate
+                      : new Date().toISOString().split("T")[0]
                   }
-                  value={new Date().toISOString().split("T")[0]}
-                  className="!w-fit !bg-transparent !border-0 shadow-none"
-                  tileClassName="text-sm p-2 rounded-full hover:bg-gray-100 "
-                  navigationLabel={({ date }) => (
-                    <span className="text-lg font-medium">
-                      {format(date, "MMMM yyyy")}
-                    </span>
-                  )}
-                  prevLabel={<ChevronLeft className="h-5 w-5" />}
-                  nextLabel={<ChevronRight className="h-5 w-5" />}
-                  next2Label={null}
-                  prev2Label={null}
-                  showNeighboringMonth={false}
-                  tileContent={null}
-                  formatShortWeekday={(locale, date) => format(date, "EEEEE")}
-                  formatDay={(locale, date) => format(date, "d")}
-                  minDate={new Date()}
-                />
-
-                {data.formState.errors.start_date && (
-                  <p className="text-red-500">
-                    {data.formState.errors.start_date.message}
-                  </p>
-                )}
-              </div>
-              <div>
-                <Calendar
-                  {...data.register("end_date")}
-                  onChange={(e) =>
-                    data.setValue(
-                      "end_date",
-                      new Date(e).toISOString().split("T")[0]
-                    )
-                  }
-                  value={new Date().toISOString().split("T")[0]}
-                  className="!w-fit !bg-transparent !border-0  shadow-none"
+                  className="!w-11/12 !bg-transparent !border-0 !mx-auto shadow-none"
                   tileClassName="text-sm p-2 rounded-full hover:bg-gray-100 transition-colors"
                   navigationLabel={({ date }) => (
                     <span className="text-lg font-medium">
@@ -326,13 +308,58 @@ export default function GenerateTour() {
                   tileContent={null}
                   formatShortWeekday={(locale, date) => format(date, "EEEEE")}
                   formatDay={(locale, date) => format(date, "d")}
-                  // minDate={
-                  //   start_date_value
-                  //     ? new Date(
-                  //         start_date_value.getTime() + 24 * 60 * 60 * 1000
-                  //       )
-                  //     : new Date()
-                  // }
+                  minDate={
+                    endDate
+                      ? new Date(
+                          new Date(endDate).getTime() - 24 * 60 * 60 * 1000
+                        )
+                      : new Date()
+                  }
+                />
+
+                {data.formState.errors.start_date && (
+                  <p className="text-red-500">
+                    {data.formState.errors.start_date.message}
+                  </p>
+                )}
+              </div>
+              <div>
+                <Calendar
+                  {...data.register("end_date")}
+                  onChange={(
+                    e: any //eslint-disable-line
+                  ) => {
+                    setEndDate(e);
+                    data.setValue(
+                      "end_date",
+                      new Date(e).toISOString().split("T")[0]
+                    );
+                  }}
+                  value={
+                    endDate ? endDate : new Date().toISOString().split("T")[0]
+                  }
+                  className="!w-11/12 !bg-transparent !border-0 !mx-auto shadow-none"
+                  tileClassName="text-sm p-2 rounded-full hover:bg-gray-100 transition-colors"
+                  navigationLabel={({ date }) => (
+                    <span className="text-lg font-medium">
+                      {format(date, "MMMM yyyy")}
+                    </span>
+                  )}
+                  prevLabel={<ChevronLeft className="h-5 w-5" />}
+                  nextLabel={<ChevronRight className="h-5 w-5" />}
+                  next2Label={null}
+                  prev2Label={null}
+                  showNeighboringMonth={false}
+                  tileContent={null}
+                  formatShortWeekday={(locale, date) => format(date, "EEEEE")}
+                  formatDay={(locale, date) => format(date, "d")}
+                  minDate={
+                    startDate
+                      ? new Date(
+                          new Date(startDate).getTime() + 24 * 60 * 60 * 1000
+                        )
+                      : new Date()
+                  }
                 />
 
                 {data.formState.errors.end_date && (
@@ -355,26 +382,28 @@ export default function GenerateTour() {
               </p>
             </div>
 
-            <div className="group mt-12 grid grid-cols-3  gap-12 self-center">
-              {tripType.map((e, i) => {
-                return (
-                  //eslint-disable-next-line
-                  <div
-                    onClick={() => {
-                      setActiveStyle(e);
-                      data.setValue("travel_style", e.toString());
-                    }}
-                    key={i}
-                    data-active={activeTripStyle === e}
-                    className={`duration-500 border-2 rounded-full p-6 text-center cursor-pointer data-[active=true]:bg-green-400`}
-                  >
-                    {e}
-                  </div>
-                );
-              })}
+            <div>
+              <div className="group mt-12 grid grid-cols-3  gap-12 self-center">
+                {tripType.map((e, i) => {
+                  return (
+                    //eslint-disable-next-line
+                    <div
+                      onClick={() => {
+                        setActiveStyle(e);
+                        data.setValue("travel_style", e.toString());
+                      }}
+                      key={i}
+                      data-active={activeTripStyle === e}
+                      className={`duration-500 border-2 rounded-full p-6 text-center cursor-pointer data-[active=true]:bg-green-400`}
+                    >
+                      {e}
+                    </div>
+                  );
+                })}
+              </div>
 
               {data.formState.errors.travel_style && (
-                <p className="text-red-500">
+                <p className="text-red-500 text-center mt-4">
                   {data.formState.errors.travel_style.message}
                 </p>
               )}
@@ -384,7 +413,7 @@ export default function GenerateTour() {
         {currentStep === "3" ? (
           <button
             type="submit"
-            className="rounded-md border-0 bg-violet-700 text-white p-2"
+            className=" border-0 bg-violet-700 text-white p-2 px-8 rounded-full shadow-xl cursor-pointer"
           >
             submit
           </button>
